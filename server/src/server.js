@@ -1,0 +1,64 @@
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const fs = require('fs');
+require('dotenv').config();
+
+// Ensure DB initialization
+require('./config/db');
+
+const authRoutes = require('./routes/auth');
+const { router: settingsRoutes } = require('./routes/settings');
+const adminStaffRoutes = require('./routes/admin/staff');
+const adminAttendanceRoutes = require('./routes/admin/attendance');
+const adminPayrollRoutes = require('./routes/admin/payroll');
+const adminRequestsRoutes = require('./routes/admin/requests');
+const adminComplaintsRoutes = require('./routes/admin/complaints');
+const adminExpensesRoutes = require('./routes/admin/expenses');
+const adminDashboardRoutes = require('./routes/admin/dashboard');
+const staffPortalRoutes = require('./routes/staff/portal');
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/settings', settingsRoutes);
+app.use('/api/admin/staff', adminStaffRoutes);
+app.use('/api/admin/attendance', adminAttendanceRoutes);
+app.use('/api/admin/payroll', adminPayrollRoutes);
+app.use('/api/admin/requests', adminRequestsRoutes);
+app.use('/api/admin/complaints', adminComplaintsRoutes);
+app.use('/api/admin/expenses', adminExpensesRoutes);
+app.use('/api/admin/dashboard', adminDashboardRoutes);
+app.use('/api/staff', staffPortalRoutes);
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Serve Frontend Production Build if available
+const clientDist = path.join(__dirname, '../../client/dist');
+if (fs.existsSync(clientDist)) {
+  app.use(express.static(clientDist));
+  app.use((req, res) => {
+    res.sendFile(path.join(clientDist, 'index.html'));
+  });
+}
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+  console.error('API Error:', err);
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal server error'
+  });
+});
+
+app.listen(PORT, () => {
+  console.log(`🚀 HRMS Backend Server running on http://localhost:${PORT}`);
+});
