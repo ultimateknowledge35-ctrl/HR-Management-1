@@ -4,8 +4,19 @@ const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
 
-// Ensure DB initialization
-require('./config/db');
+// Ensure DB initialization and auto-seed if empty
+const db = require('./config/db');
+const { seedDatabase } = require('./seed');
+
+try {
+  const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get();
+  if (!userCount || userCount.count === 0) {
+    console.log('Database is empty. Auto-seeding initial admin and demo data...');
+    seedDatabase();
+  }
+} catch (err) {
+  console.error('Auto-seed check error:', err.message);
+}
 
 const authRoutes = require('./routes/auth');
 const { router: settingsRoutes } = require('./routes/settings');
