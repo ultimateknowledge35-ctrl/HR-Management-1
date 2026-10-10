@@ -57,10 +57,18 @@ app.get('/api/health', (req, res) => {
 const clientDist = path.join(__dirname, '../../client/dist');
 if (fs.existsSync(clientDist)) {
   app.use(express.static(clientDist));
-  app.use((req, res) => {
-    res.sendFile(path.join(clientDist, 'index.html'));
+  app.use((req, res, next) => {
+    if (req.method === 'GET' && !req.path.startsWith('/api')) {
+      return res.sendFile(path.join(clientDist, 'index.html'));
+    }
+    next();
   });
 }
+
+// 404 handler for API routes
+app.use('/api', (req, res) => {
+  res.status(404).json({ error: 'API endpoint not found' });
+});
 
 // Global Error Handler
 app.use((err, req, res, next) => {
@@ -70,6 +78,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 HRMS Backend Server running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 HRMS Backend Server running on port ${PORT}`);
 });

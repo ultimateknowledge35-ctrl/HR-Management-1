@@ -10,5 +10,7 @@ client/dist/
 cloudflared.exe
 *.log
 
-# Environment
+# Environment & Database
 .env
+server/data/*.db*
+server/data/*.db
