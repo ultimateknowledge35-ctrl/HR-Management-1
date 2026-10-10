@@ -10,9 +10,8 @@ if (!fs.existsSync(dataDir)) {
 const dbPath = path.join(dataDir, 'hrms.db');
 const db = new Database(dbPath);
 
-// Enable foreign keys and WAL mode for better concurrency and reliability
+// Enable foreign keys
 db.pragma('foreign_keys = ON');
-db.pragma('journal_mode = WAL');
 
 // Initialize database schema
 function initSchema() {

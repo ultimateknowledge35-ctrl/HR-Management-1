@@ -2,6 +2,9 @@
   "name": "hr-management-system",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": "20.x"
+  },
   "scripts": {
     "dev": "concurrently -k -p \"[{name}]\" -n \"SERVER,CLIENT\" -c \"cyan.bold,magenta.bold\" \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
     "server": "npm --prefix server run dev",
